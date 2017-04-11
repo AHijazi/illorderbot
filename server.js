@@ -70,14 +70,14 @@ bot.recognizer(recognizer);
 
 bot.dialog('PlaceOrder', [
     function (session, args, next) {
-        session.send('Hi.. I am I\'ll Order Bot! I am analyzing your message: \'%s\'', session.message.text);
+        // session.send('Hi.. I am I\'ll Order Bot! I am analyzing your message: \'%s\'', session.message.text);
 
         // try extracting entities
         var itemEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Item');
         var storeEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Store');
         if (storeEntity){
         session.dialogData.store = storeEntity.entity;
-    }
+        }
     
         if (!itemEntity) {
             // airport entity detected, continue to next step
@@ -93,10 +93,10 @@ bot.dialog('PlaceOrder', [
 
      function (session, results, next) {
         session.dialogData.item=results.response;
-        session.send('Got it, so you need %s',session.dialogData.item);
+        // session.send('Got it, so you need %s',session.dialogData.item);
         // asking for store
        if (session.dialogData.store === undefined){
-          builder.Prompts.choice(session, 'From where you want to order?', "Pizza Hut|Sandella's|McDonalds");
+          builder.Prompts.choice(session, 'From where you want to order?', "Sandella's|Zoom|Aswaaq Sufouh Supermarket");
        } else { 
           next({ response: session.dialogData.store });
        }
@@ -105,7 +105,7 @@ bot.dialog('PlaceOrder', [
          if (session.dialogData.store === undefined){
         session.dialogData.store=results.response.entity;
         }
-        session.send('Got it, so you need from %s',session.dialogData.store);
+        session.send('Got it, I am confirming your order below:');
         // var message = 'I am ordering';
         // if (session.dialogData.searchType === 'full') {
         //     message += ' near %s airport...';

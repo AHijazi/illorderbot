@@ -36,6 +36,8 @@ photos, videos, and location.
 
 var restify = require('restify');
 var builder = require('botbuilder');
+var Store = require('./store');
+
 
 //=========================================================
 // Bot Setup
@@ -157,25 +159,43 @@ bot.dialog('PlaceOrder', [
   
 });
 
-bot.dialog('ShowHotelsReviews', function (session, args) {
+bot.dialog('SearchStore', function (session, args) {
     // retrieve hotel name from matched entities
-    var hotelEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Location');
-    if (hotelEntity) {
-        session.send('Looking for reviews of \'%s\'...', hotelEntity.entity);
-        Store.searchHotelReviews(hotelEntity.entity)
-            .then(function (reviews) {
+session.send('Hold on a sec.. I am searching for nearby stores');
+
+    // Async search
+        Store
+            .displayStores("stores")
+            .then(function (stores) {
+                // args
+                session.send('I found %d stores:', stores.length);
+
                 var message = new builder.Message()
                     .attachmentLayout(builder.AttachmentLayout.carousel)
-                    .attachments(reviews.map(reviewAsAttachment));
-                session.endDialog(message);
+                    .attachments(stores.map(hotelAsAttachment));
+
+                session.send(message);
+
+                // End
+                session.endDialog();
             });
-    }
+
+    // var hotelEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Location');
+    // if (hotelEntity) {
+    //     Store.searchHotelReviews(hotelEntity.entity)
+    //         .then(function (reviews) {
+    //             var message = new builder.Message()
+    //                 .attachmentLayout(builder.AttachmentLayout.carousel)
+    //                 .attachments(reviews.map(reviewAsAttachment));
+    //             session.endDialog(message);
+    //         });
+    // }
 }).triggerAction({
     matches: 'SearchStore'
 });
 
 bot.dialog('Help', function (session) {
-    session.endDialog('Hi! Try asking me things like \'search hotels in Seattle\', \'search hotels near LAX airport\' or \'show me the reviews of The Bot Resort\'');
+    session.endDialog('Hi! Try asking me things like \'Order potatos from ABC Store\', \'search a nearby store\' or \'order from City Taste Cafe\'');
 }).triggerAction({
     matches: 'Help'
 });
@@ -186,7 +206,7 @@ bot.dialog('Help', function (session) {
 function hotelAsAttachment(hotel) {
     return new builder.HeroCard()
         .title(hotel.name)
-        .subtitle('Pricd $%d ', hotel.priceStarting)
+        .subtitle('Near %s ', hotel.location)
         .images([new builder.CardImage().url(hotel.image)])
         .buttons([
             new builder.CardAction()

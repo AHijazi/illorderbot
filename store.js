@@ -8,45 +8,47 @@ var ReviewsOptions = [
     '“Positive surprise”',
     '“Beautiful suite and resort”'];
 
+    var StoreOptions = [
+    'Circle K Store DMC-1',
+    'Pascal Tepper',
+    'Party Centre Media City',
+    'Bakemart Plus',
+    'The Kebab Shop',
+    'Aswaaq Sufouh Supermarket',
+    'Last Minute Supermarket'
+ ];
+
+     var LocationOptions = [
+    'Jumeirah ',
+    'Dubai Internet City',
+    'Dubai Media City',
+    'Dubai Internet City',
+    'Jumeirah Lake Towers',
+    'Marina Mall'
+ ];
+
 module.exports = {
-    displayOrder: function (Item) {
+    displayStores: function (storess) {
         return new Promise(function (resolve) {
 
             // Filling the hotels results manually just for demo purposes
-            var hotels = [];
+            var stores = [];
             for (var i = 1; i <= 5; i++) {
-                hotels.push({
-                    name: destination + ' Order ' + i,
+                stores.push({
+                    name:  StoreOptions[Math.floor(Math.random() * StoreOptions.length)],
                     priceStarting: Math.floor(Math.random() * 450) + 80,
-                    image: 'https://placeholdit.imgix.net/~text?txtsize=35&txt=Item+' + i + '&w=500&h=260'
+                    location: LocationOptions[Math.floor(Math.random() * LocationOptions.length)],
+                    image: 'https://placeholdit.imgix.net/~text?txtsize=35&txt=Store+' + i + '&w=500&h=260'
                 });
             }
 
-            hotels.sort(function (a, b) { return a.priceStarting - b.priceStarting; });
+            stores.sort(function (a, b) { return a.priceStarting - b.priceStarting; });
 
             // complete promise with a timer to simulate async response
-            setTimeout(function () { resolve(hotels); }, 1000);
+            setTimeout(function () { resolve(stores); }, 1000);
         });
     },
-    displayStores: function (Item) {
-        return new Promise(function (resolve) {
-
-            // Filling the hotels results manually just for demo purposes
-            var hotels = [];
-            for (var i = 1; i <= 5; i++) {
-                hotels.push({
-                    name: destination + ' Order ' + i,
-                    priceStarting: Math.floor(Math.random() * 450) + 80,
-                    image: 'https://placeholdit.imgix.net/~text?txtsize=35&txt=Item+' + i + '&w=500&h=260'
-                });
-            }
-
-            hotels.sort(function (a, b) { return a.priceStarting - b.priceStarting; });
-
-            // complete promise with a timer to simulate async response
-            setTimeout(function () { resolve(hotels); }, 1000);
-        });
-    },
+   
 
     searchHotelReviews: function (hotelName) {
         return new Promise(function (resolve) {

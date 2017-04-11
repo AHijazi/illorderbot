@@ -225,7 +225,7 @@ bot.dialog('None', function (session) {
 
 var ThanksArr = [
     'I really appriciate it!😊',
-    'I can\' beleive that I am able to do all of that by myself 😅',
+    'I can\'t beleive that I am able to do all of that by myself 😅',
     'Appriciate it 😄',
     'Thanks for your support 😇'
 ]

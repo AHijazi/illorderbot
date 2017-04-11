@@ -71,37 +71,52 @@ bot.dialog('PlaceOrder', [
         session.send('Hi.. I am I\'ll Order Bot! I am analyzing your message: \'%s\'', session.message.text);
 
         // try extracting entities
-        var ietmEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Item');
-        var storeEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Item');
-        if (cityEntity) {
-            session.send('I am a spy! your form: %s', cityEntity.entity);
+        var itemEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Item');
+        var storeEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Store');
+        session.send('Got it#1 so you need %s', itemEntity.entity);
+        if (storeEntity) {
+            session.send('Got it#2 so you need %s form %s', itemEntity.entity, storeEntity.entity);
             // city entity detected, continue to next step
-            session.dialogData.searchType = 'city';
-            next({ response: cityEntity.entity });
-        } else if (airportEntity) {
+            session.dialogData.searchType = 'full';
+            session.dialogData.store=storeEntity.entity;
+            next({ response: itemEntity.entity });
+        } else if (itemEntity) {
             // airport entity detected, continue to next step
-            session.dialogData.searchType = 'airport';
-            next({ response: airportEntity.entity });
+            session.dialogData.searchType = 'item';
+            next({ response: itemEntity.entity });
         } else {
-            // no entities detected, ask user for a destination
-            builder.Prompts.text(session, 'Please enter your destination');
+            // no entities detected, ask user for item
+            builder.Prompts.text(session, 'What do you want to order?');
         }
     },
-    function (session, results) {
-        var destination = results.response;
 
-        var message = 'Looking for hotels';
-        if (session.dialogData.searchType === 'airport') {
+     function (session, results, next) {
+        session.dialogData.order=results.response;
+        session.send('Got it, so you need %s form %s',session.dialogData.order);
+        // asking for store
+       if (session.dialogData.searchType == 'full'){
+                   session.send('Got it, so you need %s form %s',session.dialogData.store);
+
+        next({ response: session.dialogData.store });
+       } else {
+         builder.Prompts.choice(session, 'From where you want to order?', "Pizza Hut|Sandella's|McDonalds");
+       }
+    },
+    function (session, results) {
+        var item = results.response;
+
+        var message = 'I am ordering';
+        if (session.dialogData.searchType === 'full') {
             message += ' near %s airport...';
         } else {
             message += ' in %s...';
         }
 
-        session.send(message, destination);
+        session.send(message, item);
 
         // Async search
         Store
-            .searchHotels(destination)
+            .displayOrder(item)
             .then(function (hotels) {
                 // args
                 session.send('I found %d hotels:', hotels.length);
@@ -123,7 +138,7 @@ bot.dialog('PlaceOrder', [
 
 bot.dialog('ShowHotelsReviews', function (session, args) {
     // retrieve hotel name from matched entities
-    var hotelEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Hotel');
+    var hotelEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Location');
     if (hotelEntity) {
         session.send('Looking for reviews of \'%s\'...', hotelEntity.entity);
         Store.searchHotelReviews(hotelEntity.entity)
@@ -135,7 +150,7 @@ bot.dialog('ShowHotelsReviews', function (session, args) {
             });
     }
 }).triggerAction({
-    matches: 'ShowHotelsReviews'
+    matches: 'SearchStore'
 });
 
 bot.dialog('Help', function (session) {
@@ -150,7 +165,7 @@ bot.dialog('Help', function (session) {
 function hotelAsAttachment(hotel) {
     return new builder.HeroCard()
         .title(hotel.name)
-        .subtitle('%d stars. %d reviews. From $%d per night.', hotel.rating, hotel.numberOfReviews, hotel.priceStarting)
+        .subtitle('Pricd $%d ', hotel.priceStarting)
         .images([new builder.CardImage().url(hotel.image)])
         .buttons([
             new builder.CardAction()

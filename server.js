@@ -159,7 +159,7 @@ bot.dialog('PlaceOrder', [
   
 });
 
-bot.dialog('SearchStore', function (session, args) {
+bot.dialog('SearchStore', function (session, args, next) {
     // retrieve hotel name from matched entities
 session.send('Hold on a sec.. I am searching for nearby stores');
 
@@ -176,8 +176,7 @@ session.send('Hold on a sec.. I am searching for nearby stores');
 
                 session.send(message);
 
-                // End
-                session.endDialog();
+             
             });
 
     // var hotelEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Location');
@@ -190,7 +189,10 @@ session.send('Hold on a sec.. I am searching for nearby stores');
     //             session.endDialog(message);
     //         });
     // }
-}).triggerAction({
+    
+}
+    
+    ).triggerAction({
     matches: 'SearchStore'
 });
 
@@ -200,9 +202,33 @@ bot.dialog('Help', function (session) {
     matches: 'Help'
 });
 
+bot.dialog('Cancel', function (session) {
+    session.endDialog('Done. I have canceled your order.');
+}).triggerAction({
+    matches: 'CancelOrder'
+});
 
+bot.dialog('Thanks', function (session) {
+    session.endDialog(ThanksArr[Math.floor(Math.random() * ThanksArr.length)]);
+}).triggerAction({
+    matches: 'Thanks'
+});
+
+bot.dialog('None', function (session) {
+    session.send('Sorry, I didn\'t get that.');
+    session.endDialog('Try asking me things like \'Order potatos from ABC Store\', \'search a nearby store\' or \'order from City Taste Cafe\'');
+}).triggerAction({
+    matches: 'None'
+});
 
 // Helpers
+
+var ThanksArr = [
+    'I really appriciate it!😊',
+    'I can\' beleive that I am able to do all of that by myself 😅',
+    'Appriciate it 😄',
+    'Thanks for your support 😇'
+]
 function hotelAsAttachment(hotel) {
     return new builder.HeroCard()
         .title(hotel.name)

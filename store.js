@@ -45,7 +45,7 @@ module.exports = {
             stores.sort(function (a, b) { return a.priceStarting - b.priceStarting; });
 
             // complete promise with a timer to simulate async response
-            setTimeout(function () { resolve(stores); }, 1000);
+            setTimeout(function () { resolve(stores); }, 3000);
         });
     },
    

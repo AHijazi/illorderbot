@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bluebird": "^3.5.0",
     "botbuilder": "^3.7.0",
     "restify": "^4.3.0"
   }

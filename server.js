@@ -63,7 +63,7 @@ var bot = new builder.UniversalBot(connector, function (session) {
 
 // You can provide your own model by specifing the 'LUIS_MODEL_URL' environment variable
 // This Url can be obtained by uploading or creating your model from the LUIS portal: https://www.luis.ai/
-var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/bb0e9c02-97c3-47af-bb97-193288568418?subscription-key=f7b961cc44714f4baca4593cead8b3e6&verbose=true&timezoneOffset=0.0&spellCheck=true&q=');
+var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/bb0e9c02-97c3-47af-bb97-193288568418?subscription-key=f7b961cc44714f4baca4593cead8b3e6&timezoneOffset=0.0&verbose=true&q=');
 bot.recognizer(recognizer);
 
 bot.dialog('PlaceOrder', [
@@ -73,63 +73,84 @@ bot.dialog('PlaceOrder', [
         // try extracting entities
         var itemEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Item');
         var storeEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Store');
-        session.send('Got it#1 so you need %s', itemEntity.entity);
-        if (storeEntity) {
-            session.send('Got it#2 so you need %s form %s', itemEntity.entity, storeEntity.entity);
-            // city entity detected, continue to next step
-            session.dialogData.searchType = 'full';
-            session.dialogData.store=storeEntity.entity;
-            next({ response: itemEntity.entity });
-        } else if (itemEntity) {
+        if (storeEntity){
+        session.dialogData.store = storeEntity.entity;
+    }
+    
+        if (!itemEntity) {
             // airport entity detected, continue to next step
-            session.dialogData.searchType = 'item';
-            next({ response: itemEntity.entity });
+            builder.Prompts.text(session, 'What do you want to order?');
+            
         } else {
             // no entities detected, ask user for item
-            builder.Prompts.text(session, 'What do you want to order?');
+             next({ response: itemEntity.entity });
+             
+            
         }
     },
 
      function (session, results, next) {
-        session.dialogData.order=results.response;
-        session.send('Got it, so you need %s form %s',session.dialogData.order);
+        session.dialogData.item=results.response;
+        session.send('Got it, so you need %s',session.dialogData.item);
         // asking for store
-       if (session.dialogData.searchType == 'full'){
-                   session.send('Got it, so you need %s form %s',session.dialogData.store);
-
-        next({ response: session.dialogData.store });
-       } else {
-         builder.Prompts.choice(session, 'From where you want to order?', "Pizza Hut|Sandella's|McDonalds");
+       if (session.dialogData.store === undefined){
+          builder.Prompts.choice(session, 'From where you want to order?', "Pizza Hut|Sandella's|McDonalds");
+       } else { 
+          next({ response: session.dialogData.store });
        }
     },
     function (session, results) {
-        var item = results.response;
-
-        var message = 'I am ordering';
-        if (session.dialogData.searchType === 'full') {
-            message += ' near %s airport...';
-        } else {
-            message += ' in %s...';
+         if (session.dialogData.store === undefined){
+        session.dialogData.store=results.response.entity;
         }
+        session.send('Got it, so you need from %s',session.dialogData.store);
+        // var message = 'I am ordering';
+        // if (session.dialogData.searchType === 'full') {
+        //     message += ' near %s airport...';
+        // } else {
+        //     message += ' in %s...';
+        // }
 
-        session.send(message, item);
+ var msg = new builder.Message(session)
+            .attachments([
+                new builder.HeroCard(session)
+                    .title('%s', session.dialogData.item)
+                    .subtitle("Store: %s | Total Price: AED %s ", session.dialogData.store, Math.floor(Math.random() * 450) + 80)
+                    .images([
+                        builder.CardImage.create(session, 'https://placeholdit.imgix.net/~text?txtsize=35&txt= Your amazing' + ' ' + session.dialogData.item + '😋&w=500&h=260')
+                    ])
+                    .tap(builder.CardAction.openUrl(session, "http://google.com"))
+            ]);
+        session.send(msg);
 
-        // Async search
-        Store
-            .displayOrder(item)
-            .then(function (hotels) {
-                // args
-                session.send('I found %d hotels:', hotels.length);
+                builder.Prompts.confirm(session, "Here are the details.. do you want to confirm?");
 
-                var message = new builder.Message()
-                    .attachmentLayout(builder.AttachmentLayout.carousel)
-                    .attachments(hotels.map(hotelAsAttachment));
 
-                session.send(message);
+        // session.send(message, item);
 
-                // End
-                session.endDialog();
-            });
+        // // Async search
+        // Store
+        //     .displayOrder(item)
+        //     .then(function (hotels) {
+        //         // args
+        //         session.send('I found %d hotels:', hotels.length);
+
+        //         var message = new builder.Message()
+        //             .attachmentLayout(builder.AttachmentLayout.carousel)
+        //             .attachments(hotels.map(hotelAsAttachment));
+
+        //         session.send(message);
+
+        //         // End
+        //         session.endDialog();
+        //     });
+    },
+    function (session, results) {
+        if (results.response ? 'yes' : 'no' === 'yes'){
+        session.send('Thats great! let me contact %s for the confirmation', session.dialogData.store);
+        } else {
+            session.send('Oh okay nevermind .. I have cancelled the order');
+        }
     }
 ]).triggerAction({
     matches: 'PlaceOrder',

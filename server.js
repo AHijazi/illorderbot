@@ -10,7 +10,7 @@ photos, videos, and location.
 var restify = require('restify');
 var builder = require('botbuilder');
 var Store = require('./store');
-var mysql      = require('mysql');
+var mysql = require('mysql');
 
 
 //=========================================================
@@ -30,6 +30,7 @@ var connector = new builder.ChatConnector({
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
+
 
 
 ///////////////////////////////////////
@@ -237,9 +238,12 @@ connection.connect();
 
 connection.query('SELECT item_name from items WHERE id = 1', function(err, rows, fields) {
   if (!err){
+      console.log('The solution is: %s', rows);
     result = 'The solution is: '+ rows;
-   } else
+   } else{
+   console.log('Error while performing Query.');
     result ='Error while performing Query.';
+   }
 });
 
 connection.end();

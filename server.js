@@ -236,9 +236,10 @@ var connection = mysql.createConnection({
 connection.connect();
 
 connection.query('SELECT item_name from items', function(err, rows, fields) {
-  if (!err)
-    return('The solution is: ', rows);
-  else
+  if (!err){
+    console.log('The solution is: ', rows[i]);
+    return('The solution is: ', rows[i]);
+   } else
     return('Error while performing Query.');
 });
 

@@ -236,10 +236,11 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-connection.query('SELECT item_name from items WHERE id = 1', function(err, rows, fields) {
+connection.query('SELECT item_name from items WHERE id = 1', function(err, rows) {
   if (!err){
       console.log('The solution is: %s', rows[0].item_name);
     result = rows[0].item_name;
+    
    } else{
    console.log('Error while performing Query.');
     result ='Error while performing Query.';

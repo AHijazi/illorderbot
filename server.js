@@ -172,7 +172,8 @@ session.send('Hold on a sec.. I am searching for nearby stores');
 });
 
 bot.dialog('Help', function (session) {
-    session.endDialog('Hi! Try asking me things like \'Order potatos from ABC Store\', \'search a nearby store\' or \'order from City Taste Cafe\'' + 'Also i have got: ' + setupDBandask());
+    session.send(setupDBandask());
+    session.endDialog('Hi! Try asking me things like \'Order potatos from ABC Store\', \'search a nearby store\' or \'order from City Taste Cafe\'' + 'Also i have got: ');
 }).triggerAction({
     matches: 'Help'
 });
@@ -226,7 +227,7 @@ function reviewAsAttachment(review) {
 
 function setupDBandask(){
 
-  var result;  
+  
 var connection = mysql.createConnection({
   host     : 'us-cdbr-azure-southcentral-f.cloudapp.net',
   user     : 'b84f40e80708f5',
@@ -239,15 +240,15 @@ connection.connect();
 connection.query('SELECT item_name from items WHERE id = 1', function(err, rows) {
   if (!err){
       console.log('The solution is: %s', rows[0].item_name);
-    result = rows[0].item_name;
+    return (rows[0].item_name);
     
    } else{
    console.log('Error while performing Query.');
-    result ='Error while performing Query.';
+     return ('Error while performing Query.');
    }
 });
 
 connection.end();
 
-return result;
+
 }

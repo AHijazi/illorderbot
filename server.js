@@ -172,7 +172,7 @@ session.send('Hold on a sec.. I am searching for nearby stores');
 });
 
 bot.dialog('Help', function (session) {
-    session.endDialog('Hi! Try asking me things like \'Order potatos from ABC Store\', \'search a nearby store\' or \'order from City Taste Cafe\'' + 'Also i have got: ', setupDBandask());
+    session.endDialog('Hi! Try asking me things like \'Order potatos from ABC Store\', \'search a nearby store\' or \'order from City Taste Cafe\'' + 'Also i have got: '+ setupDBandask());
 }).triggerAction({
     matches: 'Help'
 });

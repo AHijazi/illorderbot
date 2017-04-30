@@ -235,9 +235,9 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-connection.query('SELECT item_name from items', function(err, rows, fields) {
+connection.query('SELECT item_name from items WHERE id = 1', function(err, rows, fields) {
   if (!err){
-    result = 'The solution is: ', rows[1];
+    result = 'The solution is: '+ rows;
    } else
     result ='Error while performing Query.';
 });

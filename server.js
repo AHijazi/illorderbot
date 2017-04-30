@@ -238,8 +238,8 @@ connection.connect();
 
 connection.query('SELECT item_name from items WHERE id = 1', function(err, rows, fields) {
   if (!err){
-      console.log('The solution is: %s', rows);
-    result = 'The solution is: '+ rows;
+      console.log('The solution is: %s', rows[0].item_name);
+    result = rows[0].item_name;
    } else{
    console.log('Error while performing Query.');
     result ='Error while performing Query.';

@@ -237,8 +237,8 @@ connection.connect();
 
 connection.query('SELECT item_name from items', function(err, rows, fields) {
   if (!err){
-    console.log('The solution is: ', rows[i]);
-    return('The solution is: ', rows[i]);
+    console.log('The solution is: ', rows);
+    return('The solution is: ', rows);
    } else
     return('Error while performing Query.');
 });

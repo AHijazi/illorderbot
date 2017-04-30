@@ -225,7 +225,7 @@ function reviewAsAttachment(review) {
 
 function setupDBandask(){
 
-    
+  var result;  
 var connection = mysql.createConnection({
   host     : 'us-cdbr-azure-southcentral-f.cloudapp.net',
   user     : 'b84f40e80708f5',
@@ -237,11 +237,12 @@ connection.connect();
 
 connection.query('SELECT item_name from items', function(err, rows, fields) {
   if (!err){
-    console.log('The solution is: ', rows);
-    return('The solution is: ', rows[1]);
+    result = 'The solution is: ', rows[1];
    } else
-    return('Error while performing Query.');
+    result ='Error while performing Query.';
 });
 
 connection.end();
+
+return result;
 }

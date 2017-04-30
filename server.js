@@ -31,7 +31,13 @@ var connector = new builder.ChatConnector({
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-
+////// DB setup
+var connection = mysql.createConnection({
+  host     : 'us-cdbr-azure-southcentral-f.cloudapp.net',
+  user     : 'b84f40e80708f5',
+  password : '43bea69b',
+  database : 'illorderbot'
+});
 
 ///////////////////////////////////////
 var bot = new builder.UniversalBot(connector, function (session) {
@@ -71,7 +77,22 @@ bot.dialog('PlaceOrder', [
         // session.send('Got it, so you need %s',session.dialogData.item);
         // asking for store
        if (session.dialogData.store === undefined){
-          builder.Prompts.choice(session, 'From where you want to order?', "Sandella's|Zoom|Aswaaq Sufouh Supermarket");
+                     connection.connect();
+
+                    connection.query('SELECT store_name from stores', function(err, rows) {
+                    if (!err){
+                        console.log('The solution is: %s', rows[0].store_name);
+                        
+                                builder.Prompts.choice(session, 'From where you want to order?', rows[0].store_name +"|" +rows[1].store_name +"|" +rows[2].store_name);
+  
+                    } else{
+                    console.log('Error while performing Query.');
+                       
+                    }
+                    });
+
+                    connection.end();
+
        } else { 
           next({ response: session.dialogData.store });
        }
@@ -226,13 +247,7 @@ function reviewAsAttachment(review) {
 
 function setupDBandask(){
 
-  
-var connection = mysql.createConnection({
-  host     : 'us-cdbr-azure-southcentral-f.cloudapp.net',
-  user     : 'b84f40e80708f5',
-  password : '43bea69b',
-  database : 'illorderbot'
-});
+
 
 connection.connect();
 

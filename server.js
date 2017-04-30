@@ -10,6 +10,7 @@ photos, videos, and location.
 var restify = require('restify');
 var builder = require('botbuilder');
 var Store = require('./store');
+var mysql      = require('mysql');
 
 
 //=========================================================
@@ -224,7 +225,7 @@ function reviewAsAttachment(review) {
 
 function setupDBandask(){
 
-    var mysql      = require('mysql');
+    
 var connection = mysql.createConnection({
   host     : 'us-cdbr-azure-southcentral-f.cloudapp.net',
   user     : 'b84f40e80708f5',
